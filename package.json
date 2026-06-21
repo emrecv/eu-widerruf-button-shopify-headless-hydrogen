@@ -1,0 +1,52 @@
+{
+  "name": "hydrogen-widerruf",
+  "version": "0.1.0",
+  "description": "Drop-in Widerruf (EU right-of-withdrawal) flow for Shopify Hydrogen storefronts — self-contained page, customer status dashboard, return-label flow and emails, managed entirely from the native Shopify admin.",
+  "type": "module",
+  "license": "MIT",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "bin": {
+    "hydrogen-widerruf": "dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./server": {
+      "types": "./dist/server.d.ts",
+      "default": "./dist/server.js"
+    },
+    "./widerruf.css": "./dist/widerruf.css"
+  },
+  "scripts": {
+    "build": "tsup && cp src/ui/widerruf.css dist/widerruf.css",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "prepare": "npm run build"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-router": ">=7"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.0.0",
+    "react": "^18.0.0",
+    "react-router": "^7.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.4.0"
+  },
+  "keywords": [
+    "shopify",
+    "hydrogen",
+    "widerruf",
+    "withdrawal",
+    "returns",
+    "gdpr",
+    "react-router"
+  ]
+}
