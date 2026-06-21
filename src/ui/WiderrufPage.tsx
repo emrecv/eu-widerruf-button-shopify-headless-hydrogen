@@ -233,6 +233,19 @@ export function WiderrufPage() {
           {busy ? 'Bestellung wird gesucht…' : 'Weiter zur Produktauswahl'}
         </button>
       </Form>
+
+      <div className="wdr-cta">
+        <div>
+          <div className="wdr-cta__title">Du hast bereits widerrufen?</div>
+          <div className="wdr-cta__desc">
+            Sieh den Status deines Widerrufs ein und lade deinen Rücksendeschein
+            herunter.
+          </div>
+        </div>
+        <a href="/widerruf/status" className="wdr-btn wdr-btn--invert">
+          Status ansehen
+        </a>
+      </div>
     </div>
   );
 }

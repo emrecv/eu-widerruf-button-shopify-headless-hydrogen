@@ -119,6 +119,47 @@
   background: transparent;
   border-color: var(--wdr-line);
 }
+.wdr-btn--invert {
+  color: var(--wdr-fg);
+  background: var(--wdr-bg);
+  border-color: var(--wdr-bg);
+}
+
+/* Auffällige Sektion: Verweis aufs Status-Dashboard */
+.wdr-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-top: 44px;
+  padding: 22px 24px;
+  border-radius: var(--wdr-radius);
+  background: var(--wdr-fg);
+  color: var(--wdr-bg);
+}
+.wdr-cta__title {
+  font-size: 16px;
+  font-weight: 650;
+}
+.wdr-cta__desc {
+  font-size: 13px;
+  margin-top: 3px;
+  max-width: 42ch;
+  opacity: 0.7;
+}
+.wdr-cta .wdr-btn {
+  flex: 0 0 auto;
+}
+@media (max-width: 480px) {
+  .wdr-cta {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .wdr-cta .wdr-btn {
+    width: 100%;
+  }
+}
 
 .wdr-link {
   display: inline-block;
