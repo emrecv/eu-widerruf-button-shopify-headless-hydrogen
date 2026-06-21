@@ -238,3 +238,28 @@ export function sendLabelReadyEmail(cfg: WiderrufConfig, d: LabelReadyData) {
     html: buildLabelReadyHtml(cfg, d),
   });
 }
+
+// ── 4) Widerruf zurückgezogen ────────────────────────────────────────────────────
+
+export interface CancelledData {
+  orderName: string;
+  name: string;
+  email: string;
+}
+
+export function buildCancelledHtml(cfg: WiderrufConfig, d: CancelledData): string {
+  const body = `
+    ${heading('Widerruf zurückgezogen')}
+    ${para(`Hallo${d.name ? ` ${escapeHtml(d.name)}` : ''}, du hast deinen Widerruf zur Bestellung <strong style="color:${C.fg};">${escapeHtml(d.orderName)}</strong> zurückgezogen. Deine Bestellung bleibt damit bestehen und wird normal bearbeitet.`)}
+    ${para('Falls das ein Versehen war oder du den Widerruf doch erklären möchtest, kontaktiere uns bitte oder reiche ihn einfach erneut ein.')}
+  `;
+  return shell(cfg, 'Widerruf zurückgezogen', body);
+}
+
+export function sendWithdrawalCancelledEmail(cfg: WiderrufConfig, d: CancelledData) {
+  return send(cfg, {
+    to: d.email,
+    subject: `Widerruf zurückgezogen — ${d.orderName}`,
+    html: buildCancelledHtml(cfg, d),
+  });
+}

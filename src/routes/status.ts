@@ -1,6 +1,7 @@
 import {readConfig} from '../server/config';
 import {checkRateLimit, formatRetryAfter, getClientIP} from '../server/security.server';
-import {getWithdrawalStatus} from '../server/admin.server';
+import {cancelWithdrawal, getWithdrawalStatus} from '../server/admin.server';
+import {sendWithdrawalCancelledEmail} from '../server/email.server';
 import type {WiderrufStatusData, WiderrufStatusValues} from '../types';
 
 interface ActionArgs {
@@ -24,6 +25,7 @@ export async function widerrufStatusAction({
   const cfg = readConfig(env);
 
   const form = await request.formData();
+  const intent = String(form.get('intent') ?? '');
   const values: WiderrufStatusValues = {
     orderNumber: String(form.get('orderNumber') ?? '').trim(),
     zip: String(form.get('zip') ?? '').trim(),
@@ -44,6 +46,24 @@ export async function widerrufStatusAction({
     return {state: 'form', error: 'Bitte Bestellnummer und PLZ eingeben.', values};
   }
 
+  // Widerruf zurückziehen.
+  if (intent === 'cancel') {
+    const cancelled = await cancelWithdrawal(cfg, {
+      orderNumber: values.orderNumber,
+      zip: values.zip,
+    });
+    if (!cancelled.ok) return {state: 'form', error: cancelled.message, values};
+    if (cancelled.email) {
+      await sendWithdrawalCancelledEmail(cfg, {
+        orderName: cancelled.orderName,
+        name: cancelled.firstName ?? '',
+        email: cancelled.email,
+      }).catch(() => undefined);
+    }
+    return {state: 'cancelled', orderName: cancelled.orderName};
+  }
+
+  // Status anzeigen.
   const res = await getWithdrawalStatus(cfg, {
     orderNumber: values.orderNumber,
     zip: values.zip,
@@ -56,5 +76,7 @@ export async function widerrufStatusAction({
     status: res.status,
     items: res.items,
     labelUrl: res.labelUrl,
+    orderNumber: values.orderNumber,
+    zip: values.zip,
   };
 }

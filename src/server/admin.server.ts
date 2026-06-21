@@ -426,6 +426,103 @@ export async function getWithdrawalStatus(
   };
 }
 
+// ── Widerruf zurückziehen (vom Status-Dashboard) ─────────────────────────────────
+
+interface CancelNode {
+  id: string;
+  name: string;
+  email: string | null;
+  note: string | null;
+  tags: string[];
+  displayFinancialStatus: string | null;
+  shippingAddress: {zip: string | null} | null;
+  customer: {firstName: string | null} | null;
+  labelUrl: {value: string} | null;
+  refunds: Array<{id: string}>;
+}
+
+const CANCEL_QUERY = `#graphql
+  query WiderrufCancel($query: String!) {
+    orders(first: 5, query: $query) {
+      nodes {
+        id
+        name
+        email
+        note
+        tags
+        displayFinancialStatus
+        shippingAddress { zip }
+        customer { firstName }
+        labelUrl: metafield(namespace: "widerruf", key: "label_url") { value }
+        refunds(first: 5) { id }
+      }
+    }
+  }
+`;
+
+export type CancelResult =
+  | {ok: true; orderName: string; email: string | null; firstName: string | null}
+  | {ok: false; message: string};
+
+/**
+ * Zieht einen Widerruf zurück: entfernt den Tag „Widerruf" und vermerkt das in der
+ * Notiz. Nur möglich, solange noch kein Rücksendeschein hinterlegt und nichts erstattet
+ * wurde — danach läuft die Bearbeitung bereits und der Kunde muss uns kontaktieren.
+ */
+export async function cancelWithdrawal(
+  cfg: WiderrufConfig,
+  params: {orderNumber: string; zip: string},
+): Promise<CancelResult> {
+  const orderNumber = normalizeOrderNumber(params.orderNumber);
+  const find = await run<{orders: {nodes: CancelNode[]}}>(cfg, CANCEL_QUERY, {
+    query: `name:#${orderNumber}`,
+  });
+  if (!find.ok) return {ok: false, message: find.error ?? SERVICE_UNAVAILABLE};
+
+  const enteredZip = normalizeZip(params.zip);
+  const order = find.data?.orders.nodes.find(
+    (n) => normalizeZip(n.shippingAddress?.zip ?? '') === enteredZip && enteredZip.length > 0,
+  );
+  if (!order) return {ok: false, message: NOT_FOUND};
+
+  if (!(order.tags ?? []).includes('Widerruf')) {
+    return {ok: false, message: 'Zu dieser Bestellung liegt kein aktiver Widerruf vor.'};
+  }
+
+  const financial = (order.displayFinancialStatus ?? '').toUpperCase();
+  const inProgress =
+    financial.includes('REFUNDED') || order.refunds.length > 0 || Boolean(order.labelUrl?.value);
+  if (inProgress) {
+    return {
+      ok: false,
+      message:
+        'Dein Widerruf ist bereits in Bearbeitung und kann nicht mehr zurückgezogen werden. Bitte kontaktiere uns.',
+    };
+  }
+
+  const stamp = new Date().toLocaleString('de-DE', {
+    dateStyle: 'long',
+    timeStyle: 'short',
+    timeZone: 'Europe/Berlin',
+  });
+  const note = order.note
+    ? `${order.note}\n\n▌ WIDERRUF ZURÜCKGEZOGEN — ${stamp}`
+    : `▌ WIDERRUF ZURÜCKGEZOGEN — ${stamp}`;
+  const tags = (order.tags ?? []).filter((t) => t !== 'Widerruf');
+
+  const update = await run<{
+    orderUpdate: {userErrors: Array<{field: string[]; message: string}>};
+  }>(cfg, ORDER_UPDATE, {input: {id: order.id, note, tags}});
+  if (!update.ok) return {ok: false, message: update.error ?? SERVICE_UNAVAILABLE};
+  const errs = update.data?.orderUpdate.userErrors ?? [];
+  if (errs.length) {
+    console.error('[widerruf] cancel orderUpdate userErrors', JSON.stringify(errs));
+    return {ok: false, message: 'Der Widerruf konnte nicht zurückgezogen werden.'};
+  }
+
+  return {ok: true, orderName: order.name, email: order.email, firstName: order.customer?.firstName ?? null};
+}
+
 // ── Webhook: Rücksendeschein-Mail auslösen ───────────────────────────────────────
 
 interface LabelOrderNode {

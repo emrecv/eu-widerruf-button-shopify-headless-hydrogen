@@ -21,6 +21,26 @@ export function WiderrufStatusPage() {
   const nav = useNavigation();
   const busy = nav.state !== 'idle';
 
+  // ── Zurückgezogen ───────────────────────────────────────────────────────────
+  if (data?.state === 'cancelled') {
+    return (
+      <div className="wdr">
+        <div className="wdr-success-icon" aria-hidden>
+          ✓
+        </div>
+        <h1 className="wdr-h1">Widerruf zurückgezogen</h1>
+        <p className="wdr-lead">
+          Dein Widerruf zur Bestellung <strong>{data.orderName}</strong> wurde
+          zurückgezogen. Deine Bestellung bleibt bestehen. Eine Bestätigung ist
+          unterwegs.
+        </p>
+        <a href="/widerruf/status" className="wdr-link">
+          Zurück zum Status
+        </a>
+      </div>
+    );
+  }
+
   // ── Ergebnis ────────────────────────────────────────────────────────────────
   if (data?.state === 'result') {
     const currentIdx = ORDER.indexOf(data.status);
@@ -67,6 +87,21 @@ export function WiderrufStatusPage() {
               {data.items}
             </div>
           </div>
+        ) : null}
+
+        {data.status === 'received' ? (
+          <Form method="post" className="wdr-mt">
+            <input type="hidden" name="intent" value="cancel" />
+            <input type="hidden" name="orderNumber" value={data.orderNumber} />
+            <input type="hidden" name="zip" value={data.zip} />
+            <button
+              type="submit"
+              className="wdr-btn wdr-btn--ghost wdr-btn--full"
+              disabled={busy}
+            >
+              {busy ? 'Wird zurückgezogen…' : 'Widerruf zurückziehen'}
+            </button>
+          </Form>
         ) : null}
 
         <a href="/widerruf/status" className="wdr-link wdr-mt">

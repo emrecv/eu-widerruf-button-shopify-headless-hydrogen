@@ -1,3 +1,4 @@
+import {useState} from 'react';
 import {Form, useActionData, useNavigation} from 'react-router';
 import type {WiderrufActionData, WiderrufFormValues} from '../types';
 import type {WithdrawalLineItem} from '../server/admin.server';
@@ -29,6 +30,7 @@ export function WiderrufPage() {
   const data = useActionData() as WiderrufActionData | undefined;
   const nav = useNavigation();
   const busy = nav.state !== 'idle';
+  const [confirmed, setConfirmed] = useState(false);
 
   // ── Erfolg ────────────────────────────────────────────────────────────────
   if (data?.step === 'done') {
@@ -120,7 +122,12 @@ export function WiderrufPage() {
           </div>
 
           <label className="wdr-check">
-            <input type="checkbox" name="confirm" />
+            <input
+              type="checkbox"
+              name="confirm"
+              checked={confirmed}
+              onChange={(e) => setConfirmed(e.currentTarget.checked)}
+            />
             <span>
               Hiermit widerrufe ich den Vertrag über den Kauf der oben ausgewählten
               Waren.
@@ -129,7 +136,11 @@ export function WiderrufPage() {
 
           {error ? <ErrorNote>{error}</ErrorNote> : null}
 
-          <button type="submit" className="wdr-btn wdr-btn--full" disabled={busy}>
+          <button
+            type="submit"
+            className="wdr-btn wdr-btn--full"
+            disabled={busy || !confirmed}
+          >
             {busy ? 'Wird gesendet…' : 'Widerruf absenden'}
           </button>
 

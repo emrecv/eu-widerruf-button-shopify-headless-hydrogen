@@ -212,7 +212,9 @@ async function main() {
   await mkdir(ROUTES_DIR, {recursive: true});
   const prefix = await detectLocalePrefix();
   await writeStub(path.join(ROUTES_DIR, `${prefix}widerruf.tsx`), stub('WiderrufPage', 'widerrufAction', 'widerrufMeta'));
-  await writeStub(path.join(ROUTES_DIR, `${prefix}widerruf.status.tsx`), stub('WiderrufStatusPage', 'widerrufStatusAction', 'widerrufStatusMeta'));
+  // Trailing underscore (`widerruf_`) bricht das Nesting unter /widerruf auf,
+  // damit /widerruf/status eine eigenständige Seite ist statt das Formular zu rendern.
+  await writeStub(path.join(ROUTES_DIR, `${prefix}widerruf_.status.tsx`), stub('WiderrufStatusPage', 'widerrufStatusAction', 'widerrufStatusMeta'));
   await writeStub(
     path.join(ROUTES_DIR, `widerruf.webhook.tsx`),
     `export {widerrufWebhookAction as action} from 'hydrogen-widerruf/server';\n`,

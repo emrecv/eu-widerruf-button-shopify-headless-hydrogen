@@ -31,4 +31,8 @@ export type WiderrufStatusData =
       status: WithdrawalStatus;
       items: string | null;
       labelUrl: string | null;
-    };
+      // Für das erneute Absenden beim Zurückziehen (vom Kunden eingegeben).
+      orderNumber: string;
+      zip: string;
+    }
+  | {state: 'cancelled'; orderName: string};
