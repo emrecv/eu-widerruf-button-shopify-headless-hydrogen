@@ -1,4 +1,5 @@
 import {Form, useActionData, useNavigation} from 'react-router';
+import {WiderrufStyles} from './styles';
 import type {WiderrufStatusData, WiderrufStatusValues} from '../types';
 import type {WithdrawalStatus} from '../server/admin.server';
 
@@ -25,6 +26,7 @@ export function WiderrufStatusPage() {
   if (data?.state === 'cancelled') {
     return (
       <div className="wdr">
+      <WiderrufStyles />
         <div className="wdr-success-icon" aria-hidden>
           ✓
         </div>
@@ -46,6 +48,7 @@ export function WiderrufStatusPage() {
     const currentIdx = ORDER.indexOf(data.status);
     return (
       <div className="wdr">
+      <WiderrufStyles />
         <h1 className="wdr-h1">Status deines Widerrufs</h1>
         <p className="wdr-lead">
           Bestellung <strong>{data.orderName}</strong>
@@ -117,6 +120,7 @@ export function WiderrufStatusPage() {
 
   return (
     <div className="wdr">
+      <WiderrufStyles />
       <h1 className="wdr-h1">Widerruf-Status</h1>
       <p className="wdr-lead">
         Gib deine Bestellnummer und die Postleitzahl deiner Lieferadresse ein, um den

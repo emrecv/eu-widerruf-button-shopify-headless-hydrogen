@@ -159,14 +159,14 @@ async function detectLocalePrefix(): Promise<string> {
   }
 }
 
-function stub(component: string, action: string, meta: string, css = true): string {
+function stub(component: string, action: string, meta: string): string {
+  // Styles werden von der Komponente selbst als <style> injiziert — kein CSS-Import nötig.
   const lines = [
-    css ? `import '${"hydrogen-widerruf/widerruf.css"}';` : '',
     `import {${component}} from 'hydrogen-widerruf';`,
     `export {${action} as action${meta ? `, ${meta} as meta` : ''}} from 'hydrogen-widerruf/server';`,
     `export default ${component};`,
   ];
-  return lines.filter(Boolean).join('\n') + '\n';
+  return lines.join('\n') + '\n';
 }
 
 async function writeStub(file: string, content: string) {

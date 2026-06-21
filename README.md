@@ -81,7 +81,8 @@ Falls `init` die Definitionen nicht anlegen konnte (Berechtigungen/Version), in
 
 ## Anpassen des Designs
 
-CSS-Variablen auf einem Eltern-Element überschreiben:
+Das Design wird von den Komponenten automatisch als `<style>` injiziert (kein CSS-Import
+nötig). Zum Anpassen die CSS-Variablen auf einem Eltern-Element überschreiben:
 
 ```css
 .wdr { --wdr-fg: #111; --wdr-radius: 4px; --wdr-maxw: 560px; }

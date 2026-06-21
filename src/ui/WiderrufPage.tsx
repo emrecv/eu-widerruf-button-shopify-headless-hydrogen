@@ -1,5 +1,6 @@
 import {useState} from 'react';
 import {Form, useActionData, useNavigation} from 'react-router';
+import {WiderrufStyles} from './styles';
 import type {WiderrufActionData, WiderrufFormValues} from '../types';
 import type {WithdrawalLineItem} from '../server/admin.server';
 
@@ -36,6 +37,7 @@ export function WiderrufPage() {
   if (data?.step === 'done') {
     return (
       <div className="wdr">
+      <WiderrufStyles />
         <div className="wdr-success-icon" aria-hidden>
           ✓
         </div>
@@ -57,6 +59,7 @@ export function WiderrufPage() {
     const {values, orderName, lineItems, error} = data;
     return (
       <div className="wdr">
+      <WiderrufStyles />
         <h1 className="wdr-h1">Produkte auswählen</h1>
         <p className="wdr-lead">
           Bestellung <strong>{orderName}</strong> gefunden. Wähle die Produkte aus,
@@ -158,6 +161,7 @@ export function WiderrufPage() {
 
   return (
     <div className="wdr">
+      <WiderrufStyles />
       <h1 className="wdr-h1">Widerruf erklären</h1>
       <p className="wdr-lead">
         Gib deine Daten ein, um deine Bestellung zu finden. Anschließend wählst du die

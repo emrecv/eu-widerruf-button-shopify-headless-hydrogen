@@ -19,11 +19,10 @@
     "./server": {
       "types": "./dist/server.d.ts",
       "default": "./dist/server.js"
-    },
-    "./widerruf.css": "./dist/widerruf.css"
+    }
   },
   "scripts": {
-    "build": "tsup && cp src/ui/widerruf.css dist/widerruf.css",
+    "build": "tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
     "prepare": "npm run build"
